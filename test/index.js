@@ -5,16 +5,21 @@ Nconf.use('memory');
 Nconf.argv().env().defaults({
   PORT: 1995,
   NODE_ENV: 'test',
+  MONGODB_URI: 'mongodb://localhost:27017',
+  MONGODB_NAME: 'test_diagnostics',
 });
 
+const { clearDB } = require('./utils/db');
 const Elef = require('../server');
 
-before(() => {
+before(async () => {
   this.elefInstance = new Elef();
-  this.elefInstance.start();
+  await this.elefInstance.start();
   Axios.defaults.baseURL = `http://localhost:${Nconf.get('PORT')}`;
 });
 
-after(() => {
-  this.elefInstance.stop();
+beforeEach(async () => clearDB());
+
+after(async () => {
+  await this.elefInstance.stop();
 });

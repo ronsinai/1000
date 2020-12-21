@@ -2,9 +2,12 @@ const Express = require('express');
 require('express-async-errors');
 const Nconf = require('nconf');
 
+const DB = require('./utils/db');
+
 class App {
-  start() {
+  async start() {
     try {
+      await this._connectToDB();
       this._initApp();
     }
     catch (err) {
@@ -39,8 +42,20 @@ class App {
     this.appInstance.close();
   }
 
-  stop() {
+  async _connectToDB() {
+    this.mongoClient = await DB.connect(Nconf.get('MONGODB_URI'), Nconf.get('MONGODB_NAME'));
+    console.info(`1000 : connected to mongodb at ${Nconf.get('MONGODB_URI')}/${Nconf.get('MONGODB_NAME')}`);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async _closeDBConnection() {
+    await DB.close();
+    console.info(`1000 : disconnected from mongodb at ${Nconf.get('MONGODB_URI')}/${Nconf.get('MONGODB_NAME')}`);
+  }
+
+  async stop() {
     this._stopApp();
+    await this._closeDBConnection();
     console.info('1000 : server shutting down');
   }
 }

@@ -5,21 +5,25 @@ Nconf.use('memory');
 Nconf.argv().env().defaults({
   PORT: 1995,
   NODE_ENV: 'dev',
+  MONGODB_URI: 'mongodb://localhost:27017',
+  MONGODB_NAME: 'diagnostics',
 });
 
 const App = require('./server');
 
 const appInstance = new App();
-appInstance.shutdown = () => {
-  appInstance.stop();
+appInstance.shutdown = async () => {
+  await appInstance.stop();
 };
 
 Process.on('SIGINT', appInstance.shutdown);
 Process.on('SIGTERM', appInstance.shutdown);
 
-try {
-  appInstance.start();
-}
-catch (err) {
-  appInstance.shutdown();
-}
+(async () => {
+  try {
+    await appInstance.start();
+  }
+  catch (err) {
+    await appInstance.stop();
+  }
+})();
