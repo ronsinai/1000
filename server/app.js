@@ -3,7 +3,10 @@ require('express-async-errors');
 const Nconf = require('nconf');
 
 const DB = require('./utils/db');
+const { getLogger } = require('./utils/logger');
 const Routes = require('./routes');
+
+const logger = getLogger();
 
 class App {
   async start() {
@@ -12,7 +15,7 @@ class App {
       this._initApp();
     }
     catch (err) {
-      console.error(err);
+      logger.error(err);
       throw err;
     }
   }
@@ -37,7 +40,7 @@ class App {
 
     this.appInstance = this.app.listen(Nconf.get('PORT'), (err) => {
       if (err) throw err;
-      console.info(`1000 : server running on ${Nconf.get('PORT')}`);
+      logger.info(`1000 : server running on ${Nconf.get('PORT')}`);
     });
   }
 
@@ -47,19 +50,19 @@ class App {
 
   async _connectToDB() {
     this.mongoClient = await DB.connect(Nconf.get('MONGODB_URI'), Nconf.get('MONGODB_NAME'));
-    console.info(`1000 : connected to mongodb at ${Nconf.get('MONGODB_URI')}/${Nconf.get('MONGODB_NAME')}`);
+    logger.info(`1000 : connected to mongodb at ${Nconf.get('MONGODB_URI')}/${Nconf.get('MONGODB_NAME')}`);
   }
 
   // eslint-disable-next-line class-methods-use-this
   async _closeDBConnection() {
     await DB.close();
-    console.info(`1000 : disconnected from mongodb at ${Nconf.get('MONGODB_URI')}/${Nconf.get('MONGODB_NAME')}`);
+    logger.info(`1000 : disconnected from mongodb at ${Nconf.get('MONGODB_URI')}/${Nconf.get('MONGODB_NAME')}`);
   }
 
   async stop() {
     this._stopApp();
     await this._closeDBConnection();
-    console.info('1000 : server shutting down');
+    logger.info('1000 : server shutting down');
   }
 }
 
