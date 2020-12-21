@@ -3,6 +3,7 @@ require('express-async-errors');
 const Nconf = require('nconf');
 
 const DB = require('./utils/db');
+const Routes = require('./routes');
 
 class App {
   async start() {
@@ -26,6 +27,8 @@ class App {
         response: 'App and Running!',
       });
     });
+
+    this.app.use(Routes());
 
     this.app.use((err, req, res, next) => {
       const status = Object.getPrototypeOf(err).status || 500;
