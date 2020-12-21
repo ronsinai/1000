@@ -2,6 +2,9 @@ const Joi = require('joi');
 
 const DBOperations = require('../utils/db/operations');
 const { diagnosisSchema } = require('../schemas');
+const { getLogger } = require('../utils/logger');
+
+const logger = getLogger();
 
 class DiagnosesCollection {
   // eslint-disable-next-line space-infix-ops
@@ -19,14 +22,14 @@ class DiagnosesCollection {
     try {
       Joi.assert(diagnosis, diagnosisSchema);
       const filter = this._getFilter(diagnosis);
-      console.info(`Inserting ${diagnosis.diagnosis} diagnosis of imaging ${diagnosis.imagingId} to database`);
+      logger.info(`Inserting ${diagnosis.diagnosis} diagnosis of imaging ${diagnosis.imagingId} to database`);
       const result = await this.collection.upsert(filter, diagnosis);
-      console.info(`Inserted ${diagnosis.diagnosis} diagnosis of imaging ${diagnosis.imagingId} to database`);
+      logger.info(`Inserted ${diagnosis.diagnosis} diagnosis of imaging ${diagnosis.imagingId} to database`);
       const insertedDocument = result.value;
       return insertedDocument;
     }
     catch (err) {
-      console.error(err);
+      logger.error(err);
       throw err;
     }
   }
