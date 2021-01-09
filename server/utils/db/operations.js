@@ -6,7 +6,7 @@ class DBOperations {
   }
 
   // eslint-disable-next-line space-infix-ops
-  async createIndex(index, options={}) {
+  async createIndex(index, options = {}) {
     this.collection.createIndex(index, options);
   }
 
@@ -22,6 +22,20 @@ class DBOperations {
     };
     const options = {
       upsert: true,
+      returnOriginal: false,
+    };
+
+    return await this.collection.findOneAndUpdate(filter, update, options);
+  }
+
+  async update(filter, doc) {
+    const update = {
+      $set: doc,
+      $setOnInsert: { createdAt: new Date() },
+      $currentDate: { updatedAt: true },
+    };
+    const options = {
+      upsert: false,
       returnOriginal: false,
     };
 

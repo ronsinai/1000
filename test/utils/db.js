@@ -1,5 +1,3 @@
-const { ObjectID } = require('mongodb');
-
 const { getDB } = require('../../server/utils/db');
 
 const clearDB = async () => {
@@ -7,7 +5,7 @@ const clearDB = async () => {
 };
 
 async function findDocument(collection, id) {
-  return await getDB().collection(collection).findOne({ _id: new ObjectID(id) });
+  return await getDB().collection(collection).findOne({ _id: id });
 }
 
 module.exports = {
