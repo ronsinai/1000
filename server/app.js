@@ -48,8 +48,9 @@ class App {
     this.appInstance.close();
   }
 
+  // eslint-disable-next-line class-methods-use-this
   async _connectToDB() {
-    this.mongoClient = await DB.connect(Nconf.get('MONGODB_URI'), Nconf.get('MONGODB_NAME'));
+    await DB.connect(Nconf.get('MONGODB_URI'), Nconf.get('MONGODB_NAME'));
     logger.info(`1000 : connected to mongodb at ${Nconf.get('MONGODB_URI')}/${Nconf.get('MONGODB_NAME')}`);
   }
 

@@ -1,49 +1,35 @@
-const { getDB } = require('.');
+const Models = require('../../models');
 
 class DBOperations {
   constructor(collection) {
-    this.collection = getDB().collection(collection);
-  }
-
-  // eslint-disable-next-line space-infix-ops
-  async createIndex(index, options = {}) {
-    this.collection.createIndex(index, options);
+    this.model = Models[`${collection}Model`];
   }
 
   async findOne(query) {
-    return await this.collection.findOne(query);
+    return await this.model.findOne(query).lean();
   }
 
-  async upsert(filter, doc) {
-    const update = {
-      $set: doc,
-      $setOnInsert: { createdAt: new Date() },
-      $currentDate: { updatedAt: true },
-    };
+  async insertOne(filter, doc) {
     const options = {
       upsert: true,
+      overwrite: true,
       returnOriginal: false,
     };
 
-    return await this.collection.findOneAndUpdate(filter, update, options);
+    return await this.model.findOneAndUpdate(filter, doc, options).lean();
   }
 
-  async update(filter, doc) {
-    const update = {
-      $set: doc,
-      $setOnInsert: { createdAt: new Date() },
-      $currentDate: { updatedAt: true },
-    };
+  async updateOne(filter, update) {
     const options = {
       upsert: false,
       returnOriginal: false,
     };
 
-    return await this.collection.findOneAndUpdate(filter, update, options);
+    return await this.model.findOneAndUpdate(filter, update, options).lean();
   }
 
   async deleteOne(filter) {
-    return await this.collection.findOneAndDelete(filter);
+    return await this.model.findOneAndDelete(filter).lean();
   }
 }
 

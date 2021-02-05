@@ -10,7 +10,6 @@ class ImagingsCollection {
   // eslint-disable-next-line space-infix-ops
   constructor(collection = 'imagings') {
     this.collection = new DBOperations(collection);
-    this.collection.createIndex(collection, { type: 1, bodyPart: 1 });
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -26,9 +25,8 @@ class ImagingsCollection {
       const { age, sex } = metadata;
       const filter = this._getFilter(imaging);
       logger.info(`Inserting ${bodyPart} ${type} imaging ${_id} of ${age}y ${sex} to database`);
-      const result = await this.collection.upsert(filter, imaging);
+      const insertedDocument = await this.collection.insertOne(filter, imaging);
       logger.info(`Inserted ${bodyPart} ${type} imaging ${_id} of ${age}y ${sex} to database`);
-      const insertedDocument = result.value;
       return insertedDocument;
     }
     catch (err) {
@@ -42,12 +40,11 @@ class ImagingsCollection {
       const filter = { _id: imagingId };
       const update = { discharged: true };
       logger.info(`Discharging patient with imaging ${imagingId} in database`);
-      const result = await this.collection.update(filter, update);
-      if (!result || !result.value) {
+      const insertedDocument = await this.collection.updateOne(filter, update);
+      if (!insertedDocument) {
         throw new Error(`Could not discharge imaging ${imagingId}`);
       }
       logger.info(`Discharged patient with imaging ${imagingId} in database`);
-      const insertedDocument = result.value;
       return insertedDocument;
     }
     catch (err) {

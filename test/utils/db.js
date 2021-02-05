@@ -1,11 +1,13 @@
-const { getDB } = require('../../server/utils/db');
+const Mongoose = require('mongoose');
+
+const Models = require('../../server/models');
 
 const clearDB = async () => {
-  await getDB().dropDatabase();
+  await Mongoose.connection.dropDatabase();
 };
 
 async function findDocument(collection, id) {
-  return await getDB().collection(collection).findOne({ _id: id });
+  return await Models[`${collection}Model`].findOne({ _id: id }).lean();
 }
 
 module.exports = {

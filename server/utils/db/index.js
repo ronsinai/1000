@@ -1,30 +1,27 @@
-const Mongodb = require('mongodb');
-const { promisify } = require('util');
+const Mongoose = require('mongoose');
 
-const NEW_URL_PARSER = true;
+const USE_CREATE_INDEX = true;
+const USE_FIND_ANF_MODIFY = false;
+const USE_NEW_URL_PARSER = true;
 const USE_UNIFIED_TOPOLOGY = true;
 
-let connection;
-let db;
-
 const connect = async (url, name) => {
-  if (!db) {
-    // eslint-disable-next-line max-len
-    connection = await promisify(Mongodb.connect)(url, { useNewUrlParser: NEW_URL_PARSER, useUnifiedTopology: USE_UNIFIED_TOPOLOGY });
-    db = connection.db(name);
-  }
-
-  return db;
+  await Mongoose.connect(
+    `${url}/${name}`,
+    {
+      useCreateIndex: USE_CREATE_INDEX,
+      useFindAndModify: USE_FIND_ANF_MODIFY,
+      useNewUrlParser: USE_NEW_URL_PARSER,
+      useUnifiedTopology: USE_UNIFIED_TOPOLOGY,
+    },
+  );
 };
 
 const close = async () => {
-  await connection.close();
+  await Mongoose.connection.close();
 };
-
-const getDB = () => db;
 
 module.exports = {
   connect,
   close,
-  getDB,
 };
